@@ -1,11 +1,10 @@
 import express from 'express';
-
-import authentication from './authentication';
+// import search from './search';
 
 const router = express.Router();
 
 export default (): express.Router => {
-  authentication(router);
-  
+  // search(router);
+
   return router;
 };
