@@ -14,7 +14,7 @@ const TestScreen = () => {
       setData(false);
       setLoading(true);
       
-      const  data  = await beckn.searchItems(name, 2);
+      const  data  = await beckn.selectItem(name, 2);
       console.log('\nFrontend: ', data);
 
       setSearchResults(data);

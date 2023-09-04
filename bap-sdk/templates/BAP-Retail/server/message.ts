@@ -168,8 +168,8 @@ export default class Beckn {
         const currentTimestamp = new Date().toISOString().slice(0, -1) + "Z";
         const context = { ...contextObject };
         context.action = 'select';
-        context.bpp_id = 'mandi.succinct.in';                     //retail-osm-stage.becknprotocol.io
-        context.bpp_uri = 'https://mandi.succinct.in//boc/bpp';   //https://retail-osm-stage.becknprotocol.io//boc/bpp
+        context.bpp_id = 'bocshopify.humbhionline.in';                     //retail-osm-stage.becknprotocol.io
+        context.bpp_uri = 'https://bocshopify.humbhionline.in/bpp';   //https://retail-osm-stage.becknprotocol.io//boc/bpp
         context.timestamp = currentTimestamp;
 
         const message = {

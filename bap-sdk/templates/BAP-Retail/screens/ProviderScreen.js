@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, SafeAreaView, View, TextInput, ScrollView, Image, TouchableOpacity, Dimensions, Modal, ActivityIndicator, TouchableWithoutFeedback } from "react-native";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -6,59 +6,92 @@ import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import beckn from "../beckn.config";
+import StarRating from "../components/StarRating";
 
-const ProviderScreen = ({route}) => {
-  
+const ProviderScreen = ({ route }) => {
   const { searchResult, lat, long } = route.params;
   const location = `${lat}, ${long}`;
   const navigation = useNavigation();
 
-  console.log('\n\nThis is results in Provider', searchResult);
-  
-  const [searchTxt, setSearchTxt] = useState('');
+  console.log("\n\nThis is results in Provider", searchResult);
+
+  const [searchTxt, setSearchTxt] = useState("");
   const [result, setResult] = useState(searchResult);
   const [loading, setLoading] = useState(false);
 
   const [isModalVisible, setModalVisible] = useState(false);
   const [sliderValues, setSliderValues] = useState([0, 1000]);
+  const [newResult, setNewResult] = useState([]);
+
+  useEffect(() => {
+    let arr = [];
+    for (const shop of result) {
+      if (shop.message != undefined) {
+        arr.push({
+          imageSource: shop.message.catalog["bpp/descriptor"].symbol,
+          name: shop.message.catalog["bpp/descriptor"].name,
+          context: shop.context,
+          id: shop.message.catalog.id,
+          rating: Math.ceil(Math.random() * 4 + 1),
+        });
+      }
+    }
+
+    console.log("\n\nThis is newResult arr", arr);
+    setNewResult(arr);
+  }, [result]);
 
   const handleSearch = async () => {
-    const gps = `${lat}, ${long}`
-    try{
+    const gps = `${lat}, ${long}`;
+    try {
       setLoading(true);
-      setResult([])
+      setResult([]);
 
       const data = await beckn.searchProviders(searchTxt, gps);
-      console.log('\nFrontend: ', data);
+      console.log("\nFrontend: ", data);
 
       setResult(data);
       setLoading(false);
       setSearchTxt("");
-
-    }catch (error) {
+    } catch (error) {
       console.error(error);
-      setLoading(false); 
+      setLoading(false);
     }
-  }
+  };
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
-  }
+  };
 
   const handleValuesChange = (values) => {
     setSliderValues(values);
+  };
+
+  const rating = (sort) =>{
+
+    if(sort=="LowToHigh"){
+      setNewResult(newResult.sort((a, b) => a.rating - b.rating));
+    }
+
+    if(sort=="HighToLow"){
+      setNewResult(newResult.sort((a, b) => b.rating - a.rating));
+    }
+    setModalVisible(false)
   }
 
   return (
-
     <SafeAreaView style={styles.container}>
-
       <View style={styles.topBar}>
-
         <View style={styles.locationBar}>
-
           <TouchableOpacity>
-            <AntDesign name="left" size={20} color="black" onPress={()=>{navigation.goBack()}}/>
+            <AntDesign
+              name="left"
+              size={20}
+              color="black"
+              onPress={() => {
+                navigation.goBack();
+              }}
+            />
           </TouchableOpacity>
 
           <View style={styles.location}>
@@ -66,101 +99,111 @@ const ProviderScreen = ({route}) => {
           </View>
 
           <View>
-            <Text style={{ fontWeight: '700' }}> Your Location</Text>
+            <Text style={{ fontWeight: "700" }}> Your Location</Text>
             <View style={styles.address}>
               <Text style={{ fontSize: 12 }}> Mumbai</Text>
             </View>
           </View>
-
         </View>
 
         <View style={styles.searchBar}>
-
           <TextInput
             value={searchTxt}
             style={styles.searchInput}
             onChange={(e) => setSearchTxt(e.target.value)}
           />
-          
+
           <TouchableOpacity>
-            <FontAwesome name="search" size={24} color="black" onPress={handleSearch}/>
+            <FontAwesome
+              name="search"
+              size={24}
+              color="black"
+              onPress={handleSearch}
+            />
           </TouchableOpacity>
-
         </View>
-
       </View>
 
       <View style={styles.section}>
-
         <View style={styles.top}>
-          <Text style={styles.productFound}>{result.length} Providers Found</Text>
+          <Text style={styles.productFound}>
+            {newResult.length} Providers Found
+          </Text>
 
-          <TouchableOpacity onPress={()=>toggleModal()}>
-            <MaterialCommunityIcons name="dots-vertical" size={20} color="black" />
+          <TouchableOpacity onPress={() => toggleModal()}>
+            <MaterialCommunityIcons
+              name="dots-vertical"
+              size={20}
+              color="black"
+            />
           </TouchableOpacity>
-
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}>
-          
           {!loading ? (
-            result.map((shop, key) => {
-              if(shop.message != undefined){
-                console.log('\n\nThis is shop', shop)
-                const imageSource = shop.message.catalog["bpp/descriptor"].symbol;
-                const name = shop.message.catalog["bpp/descriptor"].name;
-                const context = shop.context;
-                const id = shop.message.catalog.id;
+            newResult.map((shop, key) => {
+              console.log("\n\nThis is shop", shop);
+              const imageSource = shop.imageSource;
+              const name = shop.name;
+              const context = shop.context;
+              const id = shop.id;
+              const rating = shop.rating;
 
-                return (
-                  <View style={styles.shopCards} key={key}>
-                    <View style={styles.shopTopBar}>
-                      <View style={styles.shopTopBarLeft}>
+              return (
+                <View style={styles.shopCards} key={key}>
+                  <View style={styles.shopTopBar}>
 
-                        <Image
-                          style={styles.shopImage}
-                          source={{
-                            uri: imageSource ? imageSource : "https://pbs.twimg.com/profile_images/1442726372011479040/fHkzTlrg_400x400.jpg",
-                          }}
-                        />
-
-                        <View>
-                          <Text style={styles.name}>
-                            <Text style={{ fontWeight: "bold", marginBottom: 10 }}>{name}</Text> 
-                          </Text>
-                          <Text>1.8Km</Text>
-                        </View>
-
-                      </View>
-
-                      <TouchableOpacity onPress={()=>{navigation.navigate('ProductScreen', {context, id, location})}}>
-                        <Text>Explore Products</Text>
-                      </TouchableOpacity>
-
+                    <View style={styles.shopRating}>
+                      <StarRating maxStars={5} rating={rating} />
                     </View>
-                  </View>
-                );
-              }
-            })
-            ) : 
-            (
-              <ActivityIndicator size="large" color="rgba(220,105,32,1)" />
-            )}
-          
-        </ScrollView>
 
+                    <View style={styles.shopTopBarLeft}>
+                      <Image
+                        style={styles.shopImage}
+                        source={{
+                          uri: imageSource
+                            ? imageSource
+                            : "https://pbs.twimg.com/profile_images/1442726372011479040/fHkzTlrg_400x400.jpg",
+                        }}
+                      />
+
+                      <View>
+                        <Text style={styles.name}>
+                          <Text
+                            style={{ fontWeight: "bold", marginBottom: 10 }}
+                          >
+                            {name}
+                          </Text>
+                        </Text>
+                        <Text>1.8Km</Text>
+                      </View>
+                    </View>
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.navigate("ProductScreen", {
+                          context,
+                          id,
+                          location,
+                        });
+                      }}
+                    >
+                      <Text>Explore Products </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            })
+          ) : (
+            <ActivityIndicator size="large" color="rgba(220,105,32,1)" />
+          )}
+        </ScrollView>
       </View>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-      >
+      <Modal animationType="slide" transparent={true} visible={isModalVisible}>
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-
           <View style={modal.modalContainer}>
             <View style={modal.modalContent}>
-
               <View style={modal.sort}>
                 <Text style={modal.headings}>Sort : </Text>
                 <Text style={modal.subheadings}>By Price :</Text>
@@ -181,15 +224,13 @@ const ProviderScreen = ({route}) => {
 
                 <Text style={modal.subheadings}>By Rating :</Text>
                 <View style={modal.flexContainer}>
-
-                  <TouchableOpacity style={modal.button}>
+                  <TouchableOpacity style={modal.button} onPress={()=>rating("LowToHigh")}>
                     <Text>Low to High</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={modal.button}>
+                  <TouchableOpacity style={modal.button} onPress={()=>rating("HighToLow")}>
                     <Text>High to Low</Text>
                   </TouchableOpacity>
-
                 </View>
                 <View style={modal.flexContainer}></View>
               </View>
@@ -233,20 +274,15 @@ const ProviderScreen = ({route}) => {
                   </TouchableOpacity>
                 </View>
               </View>
-
             </View>
           </View>
-
         </TouchableWithoutFeedback>
-
       </Modal>
-
     </SafeAreaView>
   );
 };
 
 export default ProviderScreen;
-
 
 const styles = StyleSheet.create({
   container: {
@@ -329,6 +365,12 @@ const styles = StyleSheet.create({
   explore: {
     color: "rgba(220,105,32,1)",
   },
+  shopRating:{
+    position:"absolute",
+    top:0,
+    right:0,
+    // paddingHorizontal: 10
+  }
 });
 
 const modal = StyleSheet.create({
@@ -340,15 +382,15 @@ const modal = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor:'white',
+    backgroundColor: "white",
     justifyContent: "center",
     padding: 20,
     borderRadius: 25,
     width: "100%",
   },
-  flexContainer:{
-    display:'flex',
-    flexWrap: 'wrap',
+  flexContainer: {
+    display: "flex",
+    flexWrap: "wrap",
     flexDirection: "row",
     gap: 10,
   },
@@ -369,7 +411,7 @@ const modal = StyleSheet.create({
   slider: {
     flex: 1,
     marginHorizontal: 16,
-  }, 
+  },
   button: {
     borderWidth: 1,
     borderColor: "gray",
