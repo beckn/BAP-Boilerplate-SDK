@@ -9,7 +9,8 @@ const CURR_DIR = process.cwd();
 
 //Creating Directory Name
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const CHOICES = fs.readdirSync(`${__dirname}/templates`);  //Folder choices inside templates
+
+const CHOICES = fs.readdirSync(`${__dirname}/templates`).filter(file => file !== '.DS_Store');    //Folder choices inside templates
 const DOMAINS = ['Retail: nic2004:52110', 'Mobility: nic2004:60221', 'Education: dsep:courses'];
 
 const BAP_SDK = [
