@@ -1,5 +1,5 @@
 # BAP Boilerplate SDK
----
+
 ## What is BAP SDK?
 A comprehensive NodeJS + React Native SDK, empowering developers to efficiently create Beckn-enabled consumer-facing applications (BAPs) using a streamlined boilerplate codebase. The SDK takes care of Beckn's backend code, allowing developers to prioritize UI/UX enhancements and simplify the overall development process.
 
@@ -126,6 +126,7 @@ Else if the developer want's to test the local backend follow the steps provided
 
 ### Demo Links
 **1. Link to Demo recording: [video](https://drive.google.com/file/d/1RsMddoMhVhpD0jmaPueIrZ2hoNu5tZLn/view)**
+
 **2. Link to Deployed Application: [demo](https://experience-guide-staging.becknprotocol.io/select-experience/)**
 
 
