@@ -13,6 +13,7 @@ To get started with the BAP Boilerplate SDK, please try out our cloud-based demo
 - [Prerequisites](#prerequisites)
 - [Project Setup](#project-setup)
 - [Running Application](#running-application)
+- [Deploy Application](#deploy-application)
 - [Demo Links](#demo-links)
 - [Project Structure](#project-structure)
 - [Reporting Issues](#reporting-issues)
@@ -47,7 +48,7 @@ To get started with the BAP Boilerplate SDK, please try out our cloud-based demo
 ```bash
   bap-sdk
 ```
-Choose the required prompts and enter the required fields provided by the CLI tool. This will setup a template project in your current folder, which can be modified by users.
+Choose the required prompts and enter the required fields (`bap_id` & `bap_uri`, registered in the beckn registry) provided by the CLI tool. This will setup a template project in your current folder, which can be modified by users.
 
 #### 2. Using NPM Package
 
@@ -60,20 +61,20 @@ Choose the required prompts and enter the required fields provided by the CLI to
 ```bash
   bap-sdk
 ```
-Choose the required prompts and enter the required fields provided by the CLI tool. This will setup a template project in your current folder, which can be modified by users.
+Choose the required prompts and enter the required fields (`bap_id` & `bap_uri`, registered in the beckn registry) provided by the CLI tool. This will setup a template project in your current folder, which can be modified by users.
 
 #### 3. Using Docker Images
 
 **Pull the latest docker image**
 ```bash
-  docker pull sandeeppillai/bap-sdk:v1
+  docker pull sandeeppillai/bap-sdk:v1.1
 ```
 
 **Run the container in interactive mode**
 ```bash
-  docker container run -it sandeeppillai/bap-sdk:v1
+  docker container run -it sandeeppillai/bap-sdk:v1.1
 ```
-Choose the required prompts and enter the required fields provided by the CLI tool. This will setup a template project in the working directory of the docker container.
+Choose the required prompts and enter the required fields (`bap_id` & `bap_uri`, registered in the beckn registry) provided by the CLI tool. This will setup a template project in the working directory of the docker container.
 
 **Copy the project-name created above**
 Create a new directory and copy the newly created project from docker container to your working directory
@@ -124,11 +125,67 @@ Else if the developer want's to test the local backend follow the steps provided
 ```
 ---
 
+### Deploy Application
+
+#### 1. Publish to expo
+Once you have made the required changes and modified the application, publish the app to the expo registry from your current working directory.
+
+**Login to your Expo Account**
+```bash
+  expo login
+```
+Make sure you already have an expo account or singup here: https://expo.dev/signup
+
+**Configure the project**
+```bash
+  eas build:configure
+```
+
+**Publish the app to expo**
+```bash
+  eas update
+```
+This will publish your application to the expo registry under your account. Make sure the backend is hosted in a cloud (as in our case the BECKN_URL or your own self deployed server) as this would only publish the React-Native UI.
+
+> **Note:** Download the **Expo Go** app from your playstore/appstore and scan the QR code or just enter the URL of the published app to see a live working app. For demo applications you may harcode some backend responses in case you do not have access to a BECKN_URL.
+
+
+#### 2. Build an APK file 
+
+> **Note:** Currently only tested for Android Devices. 
+
+For building an APK file you will be following the same steps as publishing to expo, as the APK will be published as a download-able file under your account.
+
+Follow the same steps as mentioned above till **configuring the project**
+
+Once you have configured the project using: `eas build:configure`
+
+An eas.json file would be added to your project. Replace the **"preview"** object of the json file with this **"preview"** object:
+```bash
+  "preview": {
+      "ios":{
+        "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+```
+
+**Build the APK file**
+```bash
+  eas build -p android --profile preview
+```
+
+This might take some time. Once the android app is built you can download the APK file under your account from the expo website. 
+
+---
 ### Demo Links
 **1. Link to Demo recording: [video](https://drive.google.com/file/d/1RsMddoMhVhpD0jmaPueIrZ2hoNu5tZLn/view)**
 
-**2. Link to Deployed Application: [demo](https://experience-guide-staging.becknprotocol.io/select-experience/)**
+**2. Link to Deployed Application: [demo](https://drive.google.com/drive/folders/1uzaNIHg59PnJ7eSmE1EZz4W8QeWHaRnz?usp=sharing)**
 
+> **Note:** On clicking the link for deployed application you will be redirected to a google drive folder. The g-drive consists of two additional folders `android` and `ios`. Both the folders consists of a **QR code that can be scanned using the Expo Go app** (available on both playstore/appstore). **Upon scanning the demo application shall upon up.** Additionaly, the `android` folder consists of an **APK file that can be downloaded and used to see the demo app in android devices.**
 
 ---
 ### Project Structure
